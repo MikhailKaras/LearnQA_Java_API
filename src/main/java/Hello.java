@@ -1,10 +1,10 @@
 public class Hello {
-    public void hellofromme() {
+    public void hellofrom() {
         System.out.println("Hello from Mikhail");
     }
 
     public static void main(String[] args) {
         Hello hello = new Hello();
-        hello.hellofromme();
+        hello.hellofrom();
     }
 }
