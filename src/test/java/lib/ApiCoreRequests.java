@@ -1,6 +1,7 @@
 package lib;
 
 import io.qameta.allure.Step;
+import io.restassured.RestAssured;
 import io.restassured.http.Header;
 import io.restassured.response.Response;
 import io.qameta.allure.restassured.AllureRestAssured;
@@ -83,4 +84,23 @@ public class ApiCoreRequests {
                 .post(url)
                 .andReturn();
     }
+    @Step("Send PUT-request to update user")
+    public Response getResponseEditUser(String url, Map<String,String> editData, String token, String cookie)
+    {
+        return given()
+                .body(editData)
+                .header(new Header("x-csrf-token", token))
+                .cookie("auth_sid", cookie)
+                .put(url)
+                .andReturn();
+    }
+    @Step("Send PUT-request to update user")
+    public Response getResponseEditUser(String url, Map<String,String> editData)
+    {
+        return given()
+                .body(editData)
+                .put(url)
+                .andReturn();
+    }
+
 }
