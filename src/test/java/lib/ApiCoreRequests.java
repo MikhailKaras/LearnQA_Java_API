@@ -5,6 +5,7 @@ import io.restassured.http.Header;
 import io.restassured.response.Response;
 import io.qameta.allure.restassured.AllureRestAssured;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -18,6 +19,30 @@ public class ApiCoreRequests {
                 .post("https://playground.learnqa.ru/api/user/")
                 .andReturn();
     }
+    @Step("Make an user")
+    public Response createUser( Map<String,String> userData) {
+        return given()
+                .body(userData)
+                .post("https://playground.learnqa.ru/api/user/")
+                .andReturn();
+    }
+    @Step("Login an user")
+    public Response loginUser( String email, String password) {
+        Map<String,String> userData = new HashMap<>();
+        userData.put("email",email);
+        userData.put("password", password);
+        return given()
+                .body(userData)
+                .post("https://playground.learnqa.ru/api/user/login");
+    }
+    @Step("Get user info as user with auth token and cookie")
+    public Response getUserInfo(String userId, String token, String cookie) {
+        return  given()
+                .header("x-csrf-token", token)
+                .cookie("auth_sid", cookie)
+                .get("https://playground.learnqa.ru/api/user/" + userId);
+    }
+
     @Step("Make a Get-Request with token and auth cookie")
     public Response makeGetRequest(String url, String token, String cookie)
     {

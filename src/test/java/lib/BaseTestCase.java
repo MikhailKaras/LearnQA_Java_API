@@ -16,12 +16,14 @@ public class BaseTestCase {
         assertTrue(headers.hasHeaderWithName(name), "Response doesn't have header with name" + name);
         return headers.getValue(name);
     }
-
     protected String getCookie(Response Response, String name) {
     Map<String,String> cookies = Response.getCookies();
 
     assertTrue(cookies.containsKey(name), "Response doesn't have cookie with name " + name);
     return cookies.get(name);
+    }
+    protected String getStringFromJson(Response Response,String name) {
+        return Response.jsonPath().getString("id");
     }
     protected int getIntFromJson(Response Response,String name) {
         Response.then().assertThat().body("$", hasKey(name));
