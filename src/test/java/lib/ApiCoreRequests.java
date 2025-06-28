@@ -36,6 +36,7 @@ public class ApiCoreRequests {
                 .body(userData)
                 .post("https://playground.learnqa.ru/api/user/login");
     }
+
     @Step("Get user info as user with auth token and cookie")
     public Response getUserInfo(String userId, String token, String cookie) {
         return  given()
@@ -100,6 +101,14 @@ public class ApiCoreRequests {
         return given()
                 .body(editData)
                 .put(url)
+                .andReturn();
+    }
+    @Step("Send DELETE-request to delete user")
+    public Response getResponseDeleteUser(String url, String token, String cookie) {
+        return given()
+                .header("x-csrf-token", token)
+                .cookie("auth_sid", cookie)
+                .delete(url)
                 .andReturn();
     }
 
