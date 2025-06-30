@@ -1,7 +1,9 @@
 package lib;
 
+import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.http.Headers;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Map;
 
@@ -10,6 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BaseTestCase {
+    @BeforeAll
+    public static void setUp() {
+        RestAssured.baseURI = "https://playground.learnqa.ru/api_dev/";
+    }
     protected String getHeader(Response Response, String name) {
         Headers headers = Response.getHeaders();
 
@@ -25,7 +31,7 @@ public class BaseTestCase {
     protected String getStringFromJson(Response Response,String name) {
         return Response.jsonPath().getString("id");
     }
-    protected String getStringJson(Response Response,String name) {
+    protected String getStringJson(Response Response,String name ){
         return Response.jsonPath().getString("user_id");
     }
     protected int getIntFromJson(Response Response,String name) {

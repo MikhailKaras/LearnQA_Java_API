@@ -5,26 +5,30 @@ import io.restassured.RestAssured;
 import io.restassured.http.Header;
 import io.restassured.response.Response;
 import io.qameta.allure.restassured.AllureRestAssured;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.given;
 
 public class ApiCoreRequests {
+
 
     @Step("Make an user with incorrect field ")
     public Response createUserWithIncorField( Map<String,String> userData) {
         return given()
                 .body(userData)
-                .post("https://playground.learnqa.ru/api/user/")
+                .post("user/")
                 .andReturn();
     }
     @Step("Make an user")
     public Response createUser( Map<String,String> userData) {
         return given()
                 .body(userData)
-                .post("https://playground.learnqa.ru/api/user/")
+                .post("user/")
                 .andReturn();
     }
     @Step("Login an user")
@@ -34,7 +38,7 @@ public class ApiCoreRequests {
         userData.put("password", password);
         return given()
                 .body(userData)
-                .post("https://playground.learnqa.ru/api/user/login");
+                .post("user/login");
     }
 
     @Step("Get user info as user with auth token and cookie")
@@ -42,7 +46,7 @@ public class ApiCoreRequests {
         return  given()
                 .header("x-csrf-token", token)
                 .cookie("auth_sid", cookie)
-                .get("https://playground.learnqa.ru/api/user/" + userId);
+                .get("user/" + userId);
     }
 
     @Step("Make a Get-Request with token and auth cookie")

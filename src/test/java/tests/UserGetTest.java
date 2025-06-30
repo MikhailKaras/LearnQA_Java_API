@@ -1,21 +1,31 @@
 package tests;
 
+import io.qameta.allure.*;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import lib.ApiCoreRequests;
 import lib.Assertions;
 import lib.BaseTestCase;
 import lib.DataGenerator;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-
+@Epic("Get user data cases")
+@Feature("Getting users data")
 public class UserGetTest extends BaseTestCase {
     @Test
+    @Description("This test checks the possibility of getting user data that are not authorized")
+    @Story("Get user data that are not authorized")
+    @DisplayName("Test negative get user data")
+    @Tag("api_dev")
+    @Severity(SeverityLevel.NORMAL)
+    @Owner("Mikhail Karas")
     public void testGetUserDataNotAuth(){
         Response responseUserData = RestAssured
-                .get("https://playground.learnqa.ru/api/user/2")
+                .get("user/2")
                 .andReturn();
         Assertions.assertJsonHasField(responseUserData,"username");
         Assertions.assertJsonHasNotField(responseUserData,"firstName");
@@ -23,6 +33,12 @@ public class UserGetTest extends BaseTestCase {
         Assertions.assertJsonHasNotField(responseUserData,"email");
     }
     @Test
+    @Description("This test checks the possibility of getting user data by the same user")
+    @Story("Get user data by the same user")
+    @DisplayName("Test positive get user data")
+    @Tag("api_dev")
+    @Severity(SeverityLevel.NORMAL)
+    @Owner("Mikhail Karas")
     public void testGetUserDetailsAuthAsSameUser()
     {
         Map<String,String> authData = new HashMap<>();
@@ -32,7 +48,7 @@ public class UserGetTest extends BaseTestCase {
         Response responseGetAuth = RestAssured
                 .given()
                 .body(authData)
-                .post("https://playground.learnqa.ru/api/user/login")
+                .post("/login")
                 .andReturn();
         String header = this.getHeader(responseGetAuth, "x-csrf-token");
         String cookie = this.getCookie(responseGetAuth,"auth_sid");
@@ -41,7 +57,7 @@ public class UserGetTest extends BaseTestCase {
                 .given()
                 .header("x-csrf-token", header )
                 .cookie("auth_sid", cookie)
-                .get("https://playground.learnqa.ru/api/user/2")
+                .get("user/2")
                 .andReturn();
 
         String[] expectedFields = {"username","firstName","lastName","email"};
@@ -54,6 +70,12 @@ public class UserGetTest extends BaseTestCase {
     String cookie;
     private final lib.ApiCoreRequests ApiCoreRequests = new ApiCoreRequests();
     @Test
+    @Description("This test checks getting user data from a new created user")
+    @Story("Get new user data by the same new user")
+    @DisplayName("Test positive get user data")
+    @Tag("api_dev")
+    @Severity(SeverityLevel.NORMAL)
+    @Owner("Mikhail Karas")
     public void testLoginUser()
     {
         Map<String,String> authData = DataGenerator.getRegistrationData();
@@ -65,7 +87,7 @@ public class UserGetTest extends BaseTestCase {
 
         Map<String,String> authData2 = DataGenerator.getRegistrationData();
         Response responseCreateSecondUser = ApiCoreRequests.createUser(authData2);
-        this.userIdonAuth2 = this.getStringFromJson(responseCreateSecondUser,"user_id");
+        this.userIdonAuth2 = this.getStringJson(responseCreateSecondUser,"user_id");
         System.out.println(responseCreateSecondUser.getStatusCode());
         System.out.println(userIdonAuth2);
 
@@ -76,6 +98,7 @@ public class UserGetTest extends BaseTestCase {
         String cookie = this.getCookie(responseLoginFirstUser,"auth_sid");
 
         Response responseGetInfoUser = ApiCoreRequests.getUserInfo(userIdonAuth2,token,cookie);
+        Assertions.assertResponseCodeEquals(responseGetInfoUser, 200);
         Assertions.assertJsonHasField(responseGetInfoUser,"username");
         Assertions.assertJsonHasNotField(responseGetInfoUser,"firstName");
         Assertions.assertJsonHasNotField(responseGetInfoUser,"lastName");

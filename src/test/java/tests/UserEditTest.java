@@ -1,5 +1,6 @@
 package tests;
 
+import io.qameta.allure.*;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
@@ -7,13 +8,22 @@ import lib.ApiCoreRequests;
 import lib.Assertions;
 import lib.BaseTestCase;
 import lib.DataGenerator;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-
+@Epic("Edit cases")
+@Feature("Edit user")
 public class UserEditTest extends BaseTestCase {
     @Test
+    @Description("This test checks the possibility of editing user")
+    @Story("Edit an user")
+    @DisplayName("Test positive edit an user")
+    @Tag("api_dev")
+    @Severity(SeverityLevel.NORMAL)
+    @Owner("Mikhail Karas")
     public void testEditJustCreatedTest()
     {
     //GENERATE USER
@@ -22,7 +32,7 @@ public class UserEditTest extends BaseTestCase {
         JsonPath responseCreateAuth = RestAssured
                 .given()
                 .body(userData)
-                .post("https://playground.learnqa.ru/api/user/")
+                .post("user/")
                 .jsonPath();
         String userId = responseCreateAuth.getString("id");
 
@@ -33,7 +43,7 @@ public class UserEditTest extends BaseTestCase {
         Response responseGetAuth = RestAssured
                 .given()
                 .body(authData)
-                .post("https://playground.learnqa.ru/api/user/login")
+                .post("login")
                 .andReturn();
         //EDIT
         String newName = "Changed Name";
@@ -45,7 +55,7 @@ public class UserEditTest extends BaseTestCase {
                 .header("x-csrf-token", this.getHeader(responseGetAuth,"x-csrf-token"))
                 .cookie("auth_sid", this.getCookie(responseGetAuth,"auth_sid"))
                 .body(editData)
-                .put("https://playground.learnqa.ru/api/user/" + userId)
+                .put("user/" + userId)
                 .andReturn();
 
         //GET
@@ -53,7 +63,7 @@ public class UserEditTest extends BaseTestCase {
                  .given()
                  .header("x-csrf-token",this.getHeader(responseGetAuth, "x-csrf-token"))
                  .cookie("auth_sid", this.getCookie(responseGetAuth,"auth_sid"))
-                 .get("https://playground.learnqa.ru/api/user/" + userId)
+                 .get("user/" + userId)
                  .andReturn();
 
         Assertions.assertJsonByName(responseUserData,"firstName", newName);
@@ -61,6 +71,12 @@ public class UserEditTest extends BaseTestCase {
     String userid;
     private final lib.ApiCoreRequests ApiCoreRequests = new ApiCoreRequests();
     @Test
+    @Description("This test checks the possibility of editing user when he is being not authorized")
+    @Story("Edit user being not authorized")
+    @DisplayName("Test negative edit an user")
+    @Tag("api_dev")
+    @Severity(SeverityLevel.NORMAL)
+    @Owner("Mikhail Karas")
     public void testNegativeEditUserBeingNotAuthorized()
     {
         Map<String,String> userData1 = DataGenerator.getRegistrationData();
@@ -71,12 +87,18 @@ public class UserEditTest extends BaseTestCase {
         String newName = "John";
         Map<String,String> editData = new HashMap<>();
         editData.put("firstName", newName);
-        Response responseEditSecondUser = ApiCoreRequests.getResponseEditUser("https://playground.learnqa.ru/api/user/"+userid,editData);
+        Response responseEditSecondUser = ApiCoreRequests.getResponseEditUser("user/"+userid,editData);
         Assertions.assertResponseCodeEquals(responseEditSecondUser,400);
         System.out.println(responseEditSecondUser.prettyPrint());
     }
 
     @Test
+    @Description("This test checks the possibility of editing user when  being authorized as another")
+    @Story("Edit user being authorized as another")
+    @DisplayName("Test negative edit an user")
+    @Tag("api_dev")
+    @Severity(SeverityLevel.NORMAL)
+    @Owner("Mikhail Karas")
     public void testNegativeEditUserWhenAuthorizedAsAnother()
     {
         //create1
@@ -100,11 +122,17 @@ public class UserEditTest extends BaseTestCase {
         Map<String,String> editData = new HashMap<>();
         editData.put("firstName", newName);
 
-        Response responseEditSecondUser = ApiCoreRequests.getResponseEditUser("https://playground.learnqa.ru/api/user/"+userid,editData,token,cookie);
+        Response responseEditSecondUser = ApiCoreRequests.getResponseEditUser("user/"+userid,editData,token,cookie);
         Assertions.assertResponseCodeEquals(responseEditSecondUser,400);
     }
 
     @Test
+    @Description("This test checks the possibility of editing user with incorrect email")
+    @Story("Edit user with incorrect email")
+    @DisplayName("Test negative edit an user")
+    @Tag("api_dev")
+    @Severity(SeverityLevel.NORMAL)
+    @Owner("Mikhail Karas")
     public void testEditUserWithIncorrectEmail()
     {
         //Create
@@ -120,13 +148,19 @@ public class UserEditTest extends BaseTestCase {
         Map<String, String> editData = new HashMap<>();
         editData.put("email", DataGenerator.getRandomIncorrectEmail());
         //Put
-        Response responseEditUser = ApiCoreRequests.getResponseEditUser("https://playground.learnqa.ru/api/user/"+userid, editData,token,cookie);
+        Response responseEditUser = ApiCoreRequests.getResponseEditUser("user/"+userid, editData,token,cookie);
         Assertions.assertResponseCodeEquals(responseEditUser,400);
         System.out.println(responseEditUser.prettyPrint());
 
     }
 
     @Test
+    @Description("This test checks the possibility of editing user with incorrect firstName")
+    @Story("Edit user with incorrect firstName")
+    @DisplayName("Test negative edit an user")
+    @Tag("api_dev")
+    @Severity(SeverityLevel.NORMAL)
+    @Owner("Mikhail Karas")
     public void testEditUserWithIncorrectFirstName()
     {
         //Create
@@ -142,7 +176,7 @@ public class UserEditTest extends BaseTestCase {
         //Put
         Map<String, String> editData = new HashMap<>();
         editData.put("firstName", DataGenerator.createShortUserName());
-        Response responseEditUser = ApiCoreRequests.getResponseEditUser("https://playground.learnqa.ru/api/user/"+userid, editData,token,cookie);
+        Response responseEditUser = ApiCoreRequests.getResponseEditUser("user/"+userid, editData,token,cookie);
         Assertions.assertResponseCodeEquals(responseEditUser,400);
         System.out.println(responseEditUser.prettyPrint());
     }
